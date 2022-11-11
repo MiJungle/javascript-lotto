@@ -37,25 +37,52 @@ class App {
   enterWinningNumber(lottos) {
     //중복안됨, 숫자여야함
     Console.print('당첨 번호를 입력해 주세요')
-   Console.readLine('', (winningNumber)=> {
+   Console.readLine('', (winningNumbers)=> {
     Console.print("")
-    return this.enterBonusNumber(winningNumber,lottos)
+    return this.enterBonusNumber(winningNumbers,lottos)
    }) 
   }
 
-  enterBonusNumber(winningNumber,lottos) {
+  enterBonusNumber(winningNumbers,lottos) {
     Console.print('보너스 번호를 입력해 주세요')
     Console.readLine('', (bonusNumber)=> {
       Console.print("")
-      return this.getStatistics(winningNumber,bonusNumber,lottos)
+      return this.getStatistics(winningNumbers,bonusNumber,lottos)
    }) 
   }
 
-  getStatistics(winningNumber,bonusNumber,lottos){
-    winningNumber = winningNumber.split(',').map(Number)
+  getStatistics(winningNumbers,bonusNumber,lottos){
+    winningNumbers = winningNumbers.split(',').map(Number).sort((a,b)=>a-b)
     Console.print('당첨 통계 \n---')
+    console.log(winningNumbers)
+    let matches = [0,0,0,0,0]//3개일치, 4개일치, ....
+    let awards = [5000,50000,1500000,30000000,2000000000]
 
-  
+    lottos.forEach((lotto)=> {
+      let count = 0
+      for(let i =0 ; i<lotto.length; i++){
+        winningNumbers.forEach((winningNumber)=> {
+          if(lotto[i]==winningNumber) count +=1
+        })
+      }
+      if(count>=3 && count <5) matches[count%3]+=1
+      if (count==5&&!lotto.includes(bonusNumber)) matches[2] +=1
+      if (count==5&& lotto.includes(bonusNumber)) matches[3] +=1
+      if (count ==6) matches[4] +=1
+    })
+    console.log(matches)
+    Console.print(`3개 일치 (5,000원) - ${matches[0]}개`)
+    Console.print(`4개 일치 (50,000원) - ${matches[1]}개`)
+    Console.print(`5개 일치 (1,500,000원) - ${matches[2]}개`)
+    Console.print(`5개 일치, 보너스 볼 일치 (30,000,000원) - ${matches[3]}개`)
+    Console.print(`6개 일치 (2,000,000,000원) - ${matches[4]}개`)
+
+    let revenue = 0 
+    for(let i = 0; i<awards.length; i++){
+      revenue += awards[i]* matches[i]
+    }
+    let earning_rate =(revenue/this.play.userInput)*100
+    return earning_rate
   }
  
 }
